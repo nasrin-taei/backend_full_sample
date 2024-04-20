@@ -64,27 +64,32 @@ func add() {
 		body, err := ioutil.ReadAll(request.Body)
 		if err != nil {
 			showError(writer, err, 400)
+			return
 		}
 
 		req := restful_model.AddReq{}
 		err = json.Unmarshal(body, &req)
 		if err != nil {
 			showError(writer, err, 400)
+			return
 		}
 
 		svcAddRes, err := service.AddService(service_model.AddSvcReq{Num1: req.A, Num2: req.B})
 		if err != nil {
 			showError(writer, err, 500)
+			return
 		}
 
 		jsonRes, err := json.Marshal(restful_model.AddRes{Result: svcAddRes.Result})
 		if err != nil {
 			showError(writer, err, 500)
+			return
 		}
 
 		_, err = writer.Write(jsonRes)
 		if err != nil {
 			showError(writer, err, 500)
+			return
 		}
 	}
 }
@@ -103,28 +108,33 @@ func sub() {
 		body, err := ioutil.ReadAll(request.Body)
 		if err != nil {
 			showError(writer, err, 400)
+			return
 		}
 
 		req := restful_model.SubReq{}
 		err = json.Unmarshal(body, &req)
 		if err != nil {
 			showError(writer, err, 400)
+			return
 		}
 
 		svcSubRes, err := service.SubService(service_model.SubSvcReq{Num1: req.A, Num2: req.B})
 		if err != nil {
 			showError(writer, err, 500)
+			return
 		}
 
 		jsonResSub, err := json.Marshal(restful_model.SubRes{Result: svcSubRes.Result})
 		if err != nil {
 			showError(writer, err, 500)
+			return
 
 		}
 
 		_, err = writer.Write(jsonResSub)
 		if err != nil {
 			showError(writer, err, 500)
+			return
 		}
 	}
 }
@@ -143,29 +153,34 @@ func mul() {
 		body, err := ioutil.ReadAll(request.Body)
 		if err != nil {
 			showError(writer, err, 400)
+			return
 		}
 
 		req := restful_model.MulReq{}
 		err = json.Unmarshal(body, &req)
 		if err != nil {
 			showError(writer, err, 400)
+			return
 		}
 
 		svcMulRes, err := service.MulService(service_model.MulSvcReq{Num1: req.A, Num2: req.B})
 		if err != nil {
 			showError(writer, err, 500)
+			return
 
 		}
 
 		jsonResMul, err := json.Marshal(restful_model.MulRes{Result: svcMulRes.Result})
 		if err != nil {
 			showError(writer, err, 500)
+			return
 
 		}
 
 		_, err = writer.Write(jsonResMul)
 		if err != nil {
 			showError(writer, err, 500)
+			return
 		}
 
 	}
@@ -185,27 +200,32 @@ func div() {
 		body, err := ioutil.ReadAll(request.Body)
 		if err != nil {
 			showError(writer, err, 400)
+			return
 		}
 
 		req := restful_model.DivReq{}
 		err = json.Unmarshal(body, &req)
 		if err != nil {
 			showError(writer, err, 400)
+			return
 		}
 
 		svcDivRes, err := service.DivService(service_model.DivSvcReq{Num1: req.A, Num2: req.B})
 		if err != nil {
 			showError(writer, err, 500)
+			return
 		}
 
 		jsonResDiv, err := json.Marshal(restful_model.DivRes{Result: svcDivRes.Result})
 		if err != nil {
 			showError(writer, err, 500)
+			return
 		}
 
 		_, err = writer.Write(jsonResDiv) //body response print
 		if err != nil {
 			showError(writer, err, 500)
+			return
 		}
 
 	}
@@ -225,17 +245,20 @@ func fetchTestTable() {
 		body, err := ioutil.ReadAll(request.Body)
 		if err != nil {
 			showError(writer, err, 400)
+			return
 		}
 
 		req := restful_model.FetchTableReq{}
 		err = json.Unmarshal(body, &req)
 		if err != nil {
 			showError(writer, err, 400)
+			return
 		}
 
 		fetchTestTableSvcRes, err := service.FetchTestTableRecords(request.Context(), service_model.FetchTableSvcReq{})
 		if err != nil {
 			showError(writer, err, 500)
+			return
 		}
 
 		resRecords := make([]restful_model.TestTableRecord, 0)
@@ -250,11 +273,13 @@ func fetchTestTable() {
 		jsonResDiv, err := json.Marshal(restful_model.FetchTableRes{Records: resRecords})
 		if err != nil {
 			showError(writer, err, 500)
+			return
 		}
 
 		_, err = writer.Write(jsonResDiv)
 		if err != nil {
 			showError(writer, err, 500)
+			return
 		}
 	}
 }
