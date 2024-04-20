@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -11,6 +12,13 @@ import (
 )
 
 var handlers map[string]func(http.ResponseWriter, *http.Request) = make(map[string]func(http.ResponseWriter, *http.Request))
+
+const (
+	getMethod    = "GET"
+	postMethod   = "POST"
+	putMethod    = "PUT"
+	deleteMethod = "DELETE"
+)
 
 func registerHandlers() map[string]func(http.ResponseWriter, *http.Request) {
 	add()
@@ -48,6 +56,11 @@ func add() {
 		defer showPanic(writer)
 		writer.Header().Add("Content-Type", "application/json")
 
+		if request.Method != postMethod {
+			showError(writer, errors.New("invalid request method"), 400)
+			return
+		}
+
 		body, err := ioutil.ReadAll(request.Body)
 		if err != nil {
 			showError(writer, err, 400)
@@ -81,6 +94,11 @@ func sub() {
 
 		defer showPanic(writer)
 		writer.Header().Add("Content-Type", "application/json")
+
+		if request.Method != postMethod {
+			showError(writer, errors.New("invalid request method"), 400)
+			return
+		}
 
 		body, err := ioutil.ReadAll(request.Body)
 		if err != nil {
@@ -116,6 +134,11 @@ func mul() {
 
 		defer showPanic(writer)
 		writer.Header().Add("Content-Type", "application/json")
+
+		if request.Method != postMethod {
+			showError(writer, errors.New("invalid request method"), 400)
+			return
+		}
 
 		body, err := ioutil.ReadAll(request.Body)
 		if err != nil {
@@ -154,6 +177,11 @@ func div() {
 		defer showPanic(writer)
 		writer.Header().Add("Content-Type", "application/json")
 
+		if request.Method != postMethod {
+			showError(writer, errors.New("invalid request method"), 400)
+			return
+		}
+
 		body, err := ioutil.ReadAll(request.Body)
 		if err != nil {
 			showError(writer, err, 400)
@@ -188,6 +216,11 @@ func fetchTestTable() {
 
 		defer showPanic(writer)
 		writer.Header().Add("Content-Type", "application/json")
+
+		if request.Method != getMethod {
+			showError(writer, errors.New("invalid request method"), 400)
+			return
+		}
 
 		body, err := ioutil.ReadAll(request.Body)
 		if err != nil {
