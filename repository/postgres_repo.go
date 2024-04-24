@@ -48,3 +48,11 @@ func FetchAllTestTableRecs(ctx context.Context) ([]entity.TestTableEntity, error
 	}
 	return entities, nil
 }
+
+func AddBook(ctx context.Context, entity entity.BookEntity) error {
+	_, err := postgresDatasource.Exec("INSERT INTO restful.restful_persistence_1.books(title, count, unit_price) VALUES ($1, $2, $3)", entity.Title, entity.Count, entity.UnitPrice)
+	if err != nil {
+		return err
+	}
+	return nil
+}

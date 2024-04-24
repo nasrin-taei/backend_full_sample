@@ -26,6 +26,7 @@ func registerHandlers() map[string]func(http.ResponseWriter, *http.Request) {
 	mul()
 	div()
 	fetchTestTable()
+	addBook()
 	return handlers
 }
 
@@ -277,6 +278,54 @@ func fetchTestTable() {
 		}
 
 		_, err = writer.Write(jsonResDiv)
+		if err != nil {
+			showError(writer, err, 500)
+			return
+		}
+	}
+}
+
+func addBook() {
+	handlers["/add_book"] = func(writer http.ResponseWriter, request *http.Request) {
+
+		defer showPanic(writer)
+		writer.Header().Add("Content-Type", "application/json")
+
+		if request.Method != postMethod {
+			showError(writer, errors.New("invalid request method"), 400)
+			return
+		}
+
+		body, err := ioutil.ReadAll(request.Body)
+		if err != nil {
+			showError(writer, err, 400)
+			return
+		}
+
+		req := restful_model.AddBookReq{}
+		err = json.Unmarshal(body, &req)
+		if err != nil {
+			showError(writer, err, 400)
+			return
+		}
+
+		_, err = service.AddBookService(request.Context(), service_model.AddBookSvcReq{
+			Title:     req.Title,
+			Count:     req.Count,
+			UnitPrice: req.UnitPrice,
+		})
+		if err != nil {
+			showError(writer, err, 400)
+			return
+		}
+
+		marshal, err := json.Marshal(restful_model.AddBookRes{})
+		if err != nil {
+			showError(writer, err, 400)
+			return
+		}
+
+		writer.Write(marshal)
 		if err != nil {
 			showError(writer, err, 500)
 			return
