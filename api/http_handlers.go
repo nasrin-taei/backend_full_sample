@@ -27,6 +27,8 @@ func registerHandlers() map[string]func(http.ResponseWriter, *http.Request) {
 	div()
 	fetchTestTable()
 	addBook()
+	updateBook()
+	deleteBook()
 	return handlers
 }
 
@@ -35,6 +37,7 @@ func showError(w http.ResponseWriter, err error, statusCode int) {
 	marErrObj, err := json.Marshal(errObj)
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 	w.WriteHeader(statusCode)
 	w.Write(marErrObj)
@@ -47,7 +50,7 @@ func showPanic(writer http.ResponseWriter) {
 		if err != nil {
 			return
 		}
-		writer.Write(marshal)
+		_, err = writer.Write(marshal)
 	}
 }
 
@@ -315,20 +318,104 @@ func addBook() {
 			UnitPrice: req.UnitPrice,
 		})
 		if err != nil {
-			showError(writer, err, 400)
+			showError(writer, err, 500)
 			return
 		}
 
 		marshal, err := json.Marshal(restful_model.AddBookRes{})
 		if err != nil {
-			showError(writer, err, 400)
+			showError(writer, err, 500)
 			return
 		}
 
-		writer.Write(marshal)
+		_, err = writer.Write(marshal)
 		if err != nil {
 			showError(writer, err, 500)
 			return
 		}
+	}
+}
+
+func updateBook() {
+	handlers["/update_book"] = func(writer http.ResponseWriter, request *http.Request) {
+		defer showPanic(writer)
+		writer.Header().Add("Content-Type", "application/json")
+
+		if request.Method != postMethod {
+			showError(writer, errors.New("invalid request method"), 400)
+			return
+		}
+		body, err := ioutil.ReadAll(request.Body)
+		if err != nil {
+			showError(writer, err, 400)
+			return
+		}
+		req := restful_model.UpdateBookReq{}
+		err = json.Unmarshal(body, &req)
+		if err != nil {
+			showError(writer, err, 400)
+			return
+		}
+		_, err = service.UpdateBookService(request.Context(), service_model.UpdateBookSvcReq{
+			Title:     req.Title,
+			Count:     req.Count,
+			UnitPrice: req.UnitPrice,
+			Id:        req.Id,
+		})
+		if err != nil {
+			showError(writer, err, 500)
+			return
+		}
+		marshal, err := json.Marshal(restful_model.UpdateBookRes{})
+
+		if err != nil {
+			showError(writer, err, 500)
+			return
+		}
+		_, err = writer.Write(marshal)
+		if err != nil {
+			showError(writer, err, 500)
+			return
+		}
+	}
+}
+
+func deleteBook() {
+	handlers["/delete_book"] = func(writer http.ResponseWriter, request *http.Request) {
+		defer showPanic(writer)
+
+		writer.Header().Add("Content-Type", "application/json")
+
+		if request.Method != deleteMethod {
+			showError(writer, errors.New("invalid request method"), 400)
+			return
+		}
+		body, err := ioutil.ReadAll(request.Body)
+		if err != nil {
+			showError(writer, err, 400)
+			return
+		}
+		req := restful_model.DeleteBookReq{}
+
+		err = json.Unmarshal(body, &req)
+		if err != nil {
+			showError(writer, err, 400)
+			return
+		}
+		_, err = service.DeleteBookService(request.Context(), service_model.DeleteBookSvcReq{Id: req.Id})
+		if err != nil {
+			showError(writer, err, 500)
+			return
+		}
+		marshal, err := json.Marshal(restful_model.DeleteBookRes{})
+		if err != nil {
+			showError(writer, err, 500)
+		}
+		_, err = writer.Write(marshal)
+		if err != nil {
+			showError(writer, err, 500)
+			return
+		}
+
 	}
 }

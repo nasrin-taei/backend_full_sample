@@ -50,7 +50,24 @@ func FetchAllTestTableRecs(ctx context.Context) ([]entity.TestTableEntity, error
 }
 
 func AddBook(ctx context.Context, entity entity.BookEntity) error {
-	_, err := postgresDatasource.Exec("INSERT INTO restful.restful_persistence_1.books(title, count, unit_price) VALUES ($1, $2, $3)", entity.Title, entity.Count, entity.UnitPrice)
+	_, err := postgresDatasource.ExecContext(ctx, "INSERT INTO restful.restful_persistence_1.books(title, count, unit_price) VALUES ($1, $2, $3)", entity.Title, entity.Count, entity.UnitPrice)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func UpdateBook(ctx context.Context, entity entity.BookEntity) error {
+	_, err := postgresDatasource.ExecContext(ctx, "UPDATE restful.restful_persistence_1.books SET title=$1 ,count=$2, unit_price=$3  WHERE id = $4", entity.Title, entity.Count, entity.UnitPrice, entity.Id)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func DeleteBook(ctx context.Context, entity entity.BookEntity) error {
+	_, err := postgresDatasource.ExecContext(ctx, "DELETE FROM restful.restful_persistence_1.books WHERE id=$1", entity.Id)
 	if err != nil {
 		return err
 	}

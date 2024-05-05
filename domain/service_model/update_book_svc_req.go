@@ -1,6 +1,6 @@
-package entity
+package service_model
 
-type BookEntity struct {
+type UpdateBookSvcReq struct {
 	Title     string
 	Count     int
 	UnitPrice int64
